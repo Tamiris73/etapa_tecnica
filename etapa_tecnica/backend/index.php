@@ -61,51 +61,41 @@
 		</section>
 		<!-- Mensagens de alerta-->
 		<script>
-				$('#insert_form').on('submit', function(event){
-    event.preventDefault();
-    
-    var nome = $('#nome').val();
-    var email = $('#email').val();
-    
-    // Realizar a verificação se o email já foi cadastrado
-    $.ajax({
-        type: 'POST',
-        url: 'verificar.php',
-        data: {email: email},
-        dataType: 'json',
-        success: function(response) {
-            if (response.success == false) {
-                // Email já cadastrado, exibir mensagem de erro
-                $("#msg-error").html('<div class="alert alert-danger" role="alert">' + response.message + '</div>');
-            } else {
-                // Email ainda não cadastrado, realizar a submissão do formulário
-                $.post("cadastrar.php", {nome: nome, email: email}, function (retorna){
-                    if (retorna.success == true) {
-                        // Limpar os campos
-                        $('#insert_form')[0].reset();
-                        
-                        // Exibir mensagem de sucesso
-                        $('#msgCadSucesso').modal('show');
-                        
-                        // Limpar mensagem de erro
-                        $("#msg-error").html(''); 
-                        
-                        // Atualizar a listagem de usuários
-                        listar_usuario(1, 50);
-                    } else {
-                        // Exibir mensagem de erro
-                        $("#msg-error").html('<div class="alert alert-danger" role="alert">' + retorna.message + '</div>');
-                    }
-                }, 'json');
-            }
-        },
-        error: function() {
-            // Exibir mensagem de erro
-            $("#msg-error").html('<div class="alert alert-danger" role="alert">Erro ao verificar o email no servidor.</div>');
-        }
-    });
-});
-
+			$('#insert_form').on('submit', function(event){
+					event.preventDefault();
+					if($('#nome').val() == ""){
+						//Alerta de campo nome vazio
+						$("#msg-error").html('<div class="alert alert-danger" role="alert">Necessário prencher o campo nome!</div>');
+					}else if($('#email').val() == ""){
+						//Alerta de campo email vazio
+						$("#msg-error").html('<div class="alert alert-danger" role="alert">Necessário prencher o campo e-mail!</div>');						
+					}else{
+						//Receber os dados do formulário
+						var dados = $("#insert_form").serialize();
+						$.post("cadastrar.php", dados, function (retorna){
+							if(retorna){
+								
+								//Limpar os campo
+								$('#insert_form')[0].reset();
+								
+								//Fechar a janela modal cadastrar
+								$('#addUsuarioModal').modal('hide');
+								
+								//Alerta de cadastro realizado com sucesso
+								//$("#msg").html('<div class="alert alert-success" role="alert">Usuário cadastrado com sucesso!</div>'); 
+								$('#msgCadSucesso').modal('show');
+								
+								//Limpar mensagem de erro
+								$("#msg-error").html('');	
+								
+								listar_usuario(1, 50);
+							}else{
+								
+							}
+							
+						});
+					}
+				});
 		</script>
     </body>
 </html>
